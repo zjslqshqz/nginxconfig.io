@@ -166,6 +166,10 @@ export default (domain, domains, global, ipPortPairs) => {
     // Use kv so we can use the same key multiple times
     const config = [];
 
+    // 站点配置文件说明
+    config.push(['# ','note explain']);
+    config.push(['# ',domain.note.noteExplain.computed]);
+
     // Build the server config on its own before adding it to the parent config
     const serverConfig = [];
 

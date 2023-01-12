@@ -34,5 +34,6 @@ import routing from './routing';
 import server from './server';
 import restrict from './restrict';
 import onion from './onion';
+import note from './note';
 
-export default { https, logging, php, presets, python, reverseProxy, routing, server, restrict, onion };
+export default { https, logging, php, presets, python, reverseProxy, routing, server, restrict, onion, note };
