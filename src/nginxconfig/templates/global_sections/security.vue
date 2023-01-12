@@ -180,7 +180,7 @@ THE SOFTWARE.
             enabled: true,
         },
         contentSecurityPolicy: {
-            default: 'default-src \'self\' http: https: ws: wss: data: blob: \'unsafe-inline\'; frame-ancestors \'self\';',
+            default: 'default-src \'self\' https: ws: wss: data: blob: \'unsafe-eval\' \'unsafe-inline\' *.alicdn.com; frame-ancestors \'self\';',
             enabled: true,
         },
         permissionsPolicy: {
