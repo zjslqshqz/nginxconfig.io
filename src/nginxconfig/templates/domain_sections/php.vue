@@ -213,7 +213,7 @@ THE SOFTWARE.
 
     const defaults = {
         phpServer: {
-            default: '/var/run/php/php-fpm.sock',
+            default: '127.0.0.1:9000',
             options: serverOptions,
             enabled: true,
         },
