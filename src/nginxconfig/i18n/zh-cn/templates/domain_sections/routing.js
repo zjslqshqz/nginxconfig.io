@@ -33,4 +33,5 @@ export default {
     enableLegacyRouting: `${common.enable}传统路由`,
     routing: '路由设置',
     FrameworkSupport: '框架兼容',
+    addCustomLocation: '自定义 location 规则',
 };

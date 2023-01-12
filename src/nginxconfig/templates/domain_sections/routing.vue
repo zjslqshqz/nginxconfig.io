@@ -149,6 +149,56 @@ THE SOFTWARE.
                 </div>
             </div>
         </div>
+        <div v-if="addCustomLocationEnabled" class="field is-horizontal is-aligned-top">
+            <div class="field-label has-margin-top">
+                <label class="label">{{ $t('templates.domainSections.routing.addCustomLocation') }}</label>
+            </div>
+            <div class="field-body is-vertical">
+                <div class="field"><a class="button is-mini">添加规则</a></div>
+                <div class="field is-horizontal">
+                    <div class="field">1.</div>
+                    <div class="field-body">
+                        <div class="field is-vertical">
+                            <div class="field is-horizontal">
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div :class="`control${customLocationChanged ? ' is-changed' : ''}`">
+                                            <VueSelect
+                                                v-model="customLocation"
+                                                :options="customLocationOptions"
+                                                :clearable="false"
+                                                :reduce="s => s.value"
+                                            ></VueSelect>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <input class="input" type="text" :placeholder="'正则与URL地址'" />
+                                    </div>
+                                    <div class="field">
+                                        <a class="button is-mini">添加指令</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 指令 -->
+                            <div class="field is-horizontal">
+                                <div class="field-body">
+                                    <div class="field">
+                                        <input class="input" type="text" :placeholder="'指令'" />
+                                    </div>
+                                    <div class="field">
+                                        <input class="input" type="text" :placeholder="'参数'" />
+                                    </div>
+                                    <div class="field">
+                                        <a class="button is-mini is-danger">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field"><a class="button is-mini is-danger">删除规则</a></div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -157,7 +207,15 @@ THE SOFTWARE.
     import computedFromDefaults from '../../util/computed_from_defaults';
     import PrettyCheck from '../inputs/checkbox';
     import PrettyRadio from '../inputs/radio';
-
+    import VueSelect from 'vue-select';
+    const hiddenValues = [''];
+    const customLocationOptions = {
+        '': '无修饰符',
+        '=': '精确查找',
+        '~': '区分大小写匹配',
+        '~*': '不区分大小写匹配',
+        '^~': '前缀匹配',
+    };
     const defaults = {
         root: {
             default: true,
@@ -193,6 +251,15 @@ THE SOFTWARE.
             options: ['ThinkPHP 6', 'HIS'],
             enabled: true,
         },
+        addCustomLocation: {
+            default: true,
+            enabled: true,
+        },
+        customLocation:{
+            default: '',
+            options: customLocationOptions,
+            enabled: true,
+        },
     };
 
     export default {
@@ -201,13 +268,20 @@ THE SOFTWARE.
         key: 'routing',                                         // Key for data in parent
         delegated: delegatedFromDefaults(defaults),             // Data the parent will present here
         components: {
+            VueSelect,
             PrettyCheck,
             PrettyRadio,
         },
         props: {
             data: Object,                                       // Data delegated back to us from parent
         },
-        computed: computedFromDefaults(defaults, 'routing'),    // Getters & setters for the delegated data
+        computed: {
+            ...computedFromDefaults(defaults, 'routing'),
+            customLocationOptions() {
+                return Object.entries(this.$props.data.customLocation.options)
+                    .map(([key, value]) => this.formattedOption(key, value));
+            },
+        },    // Getters & setters for the delegated data
         watch: {
             // Disable all options (expect legacy php) if root is disabled
             '$props.data.root': {
@@ -264,6 +338,14 @@ THE SOFTWARE.
                     }
                 },
                 deep: true,
+            },
+        },
+        methods: {
+            formattedOption(key, value) {
+                return {
+                    label: `${this.$t(value)}${hiddenValues.includes(key) ? '' : `: ${key}`}`,
+                    value: key,
+                };
             },
         },
     };
