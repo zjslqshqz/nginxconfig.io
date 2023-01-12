@@ -261,7 +261,7 @@ THE SOFTWARE.
             enabled: true,
         },
         certType: {
-            default: 'letsEncrypt',
+            default: 'custom',
             options: {
                 letsEncrypt: 'common.letsEncrypt', // i18n key
                 custom: 'templates.domainSections.https.customCertificate', // i18n key
@@ -271,15 +271,15 @@ THE SOFTWARE.
         letsEncryptEmail: {
             default: '',
             computed: `info@${serverDomainDefault}`, // No default value, but a default computed
-            enabled: true,
+            enabled: false,
         },
         sslCertificate: {
             default: '',
-            enabled: false,
+            enabled: true,
         },
         sslCertificateKey: {
             default: '',
-            enabled: false,
+            enabled: true,
         },
     };
 
