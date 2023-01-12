@@ -44,7 +44,7 @@ THE SOFTWARE.
                             v-model="accessLogPath"
                             class="input"
                             type="text"
-                            :placeholder="$props.data.accessLogPath.default"
+                            :placeholder="`/var/log/nginx/${$parent.$props.data.server.domain.computed}-access.log`"
                         />
                     </div>
                 </div>
@@ -104,7 +104,7 @@ THE SOFTWARE.
                                 class="input"
                                 type="text"
                                 :disabled="!errorLogPathEnabled"
-                                :placeholder="$props.data.errorLogPath.default"
+                                :placeholder="`/var/log/nginx/${this.$parent.$props.data.server.domain.computed}-error.log`"
                             />
                         </div>
                     </div>
