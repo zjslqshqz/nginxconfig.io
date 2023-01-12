@@ -291,7 +291,6 @@ export default (domain, domains, global, ipPortPairs) => {
     }
 
     // framework support
-    console.log(1,domain);
     if (domain.routing.isFrameworkSupport.computed) {
         if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
             if (global.tools.modularizedStructure.computed) {
