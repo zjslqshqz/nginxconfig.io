@@ -202,6 +202,16 @@ export default (domain, domains, global, ipPortPairs) => {
     // HTTPS
     serverConfig.push(...sslConfig(domain, global));
 
+    // 维护模式
+    if (domain.server.maintenanceModule.computed){
+        serverConfig.push(['# maintenanceModule','']);
+        serverConfig.push(['set $maintenance off','']);
+        serverConfig.push(['if ($maintenance = on)',{
+            'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
+        }]);
+    }
+
+
     // Onion location
     if (domain.onion.onionLocation.computed) {
         serverConfig.push(['# Onion services', '']);

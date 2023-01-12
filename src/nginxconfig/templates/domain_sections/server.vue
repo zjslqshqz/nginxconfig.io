@@ -141,6 +141,48 @@ THE SOFTWARE.
                 </div>
             </div>
         </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label">
+                <label class="label">维护功能</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div :class="`control${maintenanceModuleChanged ? ' is-changed' : ''}`">
+                        <div class="checkbox">
+                            <PrettyCheck v-model="maintenanceModule" class="p-default p-curve p-fill p-icon">
+                                启用
+                            </PrettyCheck>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="maintenanceModuleEnabled" class="field is-horizontal is-aligned-top">
+            <div class="field-label has-margin-top">
+                <label class="label">维护状态HTTP码设置</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div :class="`control${maintenanceHttpCodeSetChanged ? ' is-changed' : ''}`">
+                        <VueSelect
+                            v-model="maintenanceHttpCodeSet"
+                            :options="maintenanceHttpCodeSetOptions"
+                            :clearable="false"
+                            :reduce="s => s.value"
+                        ></VueSelect>
+                    </div>
+
+                    <div
+                        v-if="maintenanceHttpCodeSetCustomEnabled"
+                        :class="`control${maintenanceHttpCodeSetChanged ? ' is-changed' : ''}`"
+                    >
+                        <input v-model="maintenanceHttpCodeSetCustom" class="input" type="text" :placeholder="$props.data.maintenanceHttpCodeSetCustom.default" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -149,6 +191,22 @@ THE SOFTWARE.
     import computedFromDefaults from '../../util/computed_from_defaults';
     import { serverDomainDefault } from '../../util/defaults';
     import PrettyCheck from '../inputs/checkbox';
+    import VueSelect from 'vue-select';
+    const hiddenValues = ['', 'custom'];
+    const maintenanceHttpCodeSetOptions = {
+        '500': 'templates.domainSections.server.http500',
+        '501': 'templates.domainSections.server.http501',
+        '502': 'templates.domainSections.server.http502',
+        '503': 'templates.domainSections.server.http503',
+        '504': 'templates.domainSections.server.http504',
+        '505': 'templates.domainSections.server.http505',
+        '506': 'templates.domainSections.server.http506',
+        '507': 'templates.domainSections.server.http507',
+        '508': 'templates.domainSections.server.http508',
+        '510': 'templates.domainSections.server.http510',
+        '511': 'templates.domainSections.server.http511',
+        'custom': '自定义',
+    };
 
     const defaults = {
         domain: {
@@ -184,6 +242,19 @@ THE SOFTWARE.
             default: '::',
             enabled: true,
         },
+        maintenanceModule:{
+            default: true,
+            enabled: true,
+        },
+        maintenanceHttpCodeSet:{
+            default: '503',
+            options: maintenanceHttpCodeSetOptions,
+            enabled: true,
+        },
+        maintenanceHttpCodeSetCustom:{
+            default: '',
+            enabled: false,
+        },
     };
 
     export default {
@@ -193,6 +264,7 @@ THE SOFTWARE.
         delegated: delegatedFromDefaults(defaults),             // Data the parent will present here
         components: {
             PrettyCheck,
+            VueSelect,
         },
         props: {
             data: Object,                                       // Data delegated back to us from parent
@@ -205,6 +277,10 @@ THE SOFTWARE.
             },
             hasWarnings() {
                 return this.duplicateDomain;
+            },
+            maintenanceHttpCodeSetOptions() {
+                return Object.entries(this.$props.data.maintenanceHttpCodeSet.options)
+                    .map(([key, value]) => this.formattedOption(key, value));
             },
         },
         watch: {
@@ -250,6 +326,44 @@ THE SOFTWARE.
                     }
                 },
                 deep: true,
+            },
+            '$props.data.maintenanceModule': {
+                handler(data) {
+                    // This might cause recursion, but seems not to
+                    if (data.computed) {
+                        this.$props.data.maintenanceModule.enabled = true;
+                        // this.$props.data.maintenanceSet.computed = this.$props.data.maintenanceSet.value;
+                    } else {
+                        this.$props.data.maintenanceModule.enabled = false;
+                        // this.$props.data.maintenanceSet.computed = false;
+                    }
+                },
+                deep: true,
+            },
+            '$props.data.maintenanceHttpCodeSet': {
+                handler(data) {
+                    if (data.enabled) {
+                        // This might cause recursion, but seems not to
+                        if (!Object.keys(data.options).includes(data.computed))
+                            data.computed = data.default;
+
+                        // Show the custom box
+                        this.$props.data.maintenanceHttpCodeSetCustom.enabled = data.computed === 'custom';
+                        return;
+                    }
+
+                    // Hide custom if disabled
+                    this.$props.data.maintenanceHttpCodeSetCustom.enabled = false;
+                },
+                deep: true,
+            },
+        },
+        methods: {
+            formattedOption(key, value) {
+                return {
+                    label: `${this.$t(value)}${hiddenValues.includes(key) ? '' : `: ${key}`}`,
+                    value: key,
+                };
             },
         },
     };
