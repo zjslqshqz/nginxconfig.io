@@ -136,8 +136,8 @@ THE SOFTWARE.
             enabled: true,
         },
         index: {
-            default: 'index.php',
-            options: ['index.html', 'index.php'],
+            default: '兼容模式',
+            options: ['index.html', 'index.php','兼容模式'],
             enabled: true,
         },
         fallbackHtml: {

@@ -245,10 +245,17 @@ export default (domain, domains, global, ipPortPairs) => {
     }
 
     // index.php
-    if (domain.routing.index.computed === 'index.php') {
-        serverConfig.push(['# index.php', '']);
-        serverConfig.push(['index', 'index.php']);
+    if(domain.routing.index.computed){
+        if (domain.routing.index.computed === 'index.php') {
+            serverConfig.push(['# index.php', '']);
+            serverConfig.push(['index', 'index.php']);
+        }
+        if (domain.routing.index.computed === '兼容模式') {
+            serverConfig.push(['# index.php', '']);
+            serverConfig.push(['index', 'index.php index.html']);
+        }
     }
+
 
     // Fallback index.html or index.php
     if ((domain.routing.fallbackHtml.computed || domain.routing.fallbackPhp.computed)
