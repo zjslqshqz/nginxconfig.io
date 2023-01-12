@@ -157,7 +157,7 @@ THE SOFTWARE.
             enabled: true,
         },
         symlinkVhost: {
-            default: true,
+            default: false,
             enabled: true,
         },
     };
