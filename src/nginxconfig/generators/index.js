@@ -41,6 +41,8 @@ import joomlaConf from './conf/joomla.conf';
 import dockerComposeYaml from './yaml/dockerCompose.yaml';
 import dockerConf from './ext/docker';
 import shareQuery from '../util/share_query';
+import thinkPHPConf from './conf/thinkphp';
+import HISConf from './conf/his';
 
 export default (domains, global) => {
     const files = {};
@@ -100,6 +102,14 @@ export default (domains, global) => {
         // Joomla
         if (domains.some(d => d.php.joomlaRules.computed))
             files['nginxconfig.io/joomla.conf'] = toConf(joomlaConf());
+
+        // thinkPHP
+        if (domains.some(d => d.routing.isFrameworkSupport.computed && d.routing.frameworkSupport.computed === 'ThinkPHP 6'))
+            files['nginxconfig.io/thinkphp.conf'] = toConf(thinkPHPConf());
+
+        // his
+        if (domains.some(d => d.routing.isFrameworkSupport.computed && d.routing.frameworkSupport.computed === 'HIS'))
+            files['nginxconfig.io/his.conf'] = toConf(HISConf());
 
     } else {
         // PHP

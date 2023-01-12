@@ -40,6 +40,8 @@ import joomlaConf from './joomla.conf';
 import letsEncryptConf from './letsencrypt.conf';
 import phpPath from '../../util/php_path';
 import phpUpstream from '../../util/php_upstream';
+import thinkPHPConf from './thinkphp';
+import HISConf from './his';
 
 const sslConfig = (domain, global) => {
     const config = [];
@@ -286,6 +288,31 @@ export default (domain, domains, global, ipPortPairs) => {
         serverConfig.push([`location ~ ^${domain.routing.fallbackPhpPath.computed}`, {
             try_files: '$uri $uri/ /index.php?$query_string',
         }]);
+    }
+
+    // framework support
+    console.log(1,domain);
+    if (domain.routing.isFrameworkSupport.computed) {
+        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
+            if (global.tools.modularizedStructure.computed) {
+                // Modularized
+                serverConfig.push(['# thinkphp 6', '']);
+                serverConfig.push(['include', 'nginxconfig.io/thinkphp.conf']);
+            } else {
+                // Unified
+                serverConfig.push(...thinkPHPConf());
+            }
+        }
+        if (domain.routing.frameworkSupport.computed === 'HIS'){
+            if (global.tools.modularizedStructure.computed) {
+                // Modularized
+                serverConfig.push(['# his', '']);
+                serverConfig.push(['include', 'nginxconfig.io/his.conf']);
+            } else {
+                // Unified
+                serverConfig.push(...HISConf());
+            }
+        }
     }
 
     // Python

@@ -62,7 +62,35 @@ THE SOFTWARE.
                 </div>
             </div>
         </div>
+        <div v-if="isFrameworkSupportEnabled" class="field is-horizontal is-aligned-top">
+            <div class="field-label">
+                <label class="label">{{ $t('templates.domainSections.routing.FrameworkSupport') }}</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div :class="`control${isFrameworkSupportChanged ? ' is-changed' : ''}`">
+                        <div class="checkbox">
+                            <PrettyCheck v-model="isFrameworkSupport" class="p-default p-curve p-fill p-icon">
+                                {{ $t('common.enable') }}
+                            </PrettyCheck>
+                        </div>
+                    </div>
+                    <div v-if="frameworkSupportEnabled">
+                        <div
 
+                            v-for="value in $props.data.frameworkSupport.options"
+                            :class="`control${frameworkSupportChanged && value === frameworkSupport ? ' is-changed' : ''}`"
+                        >
+                            <div class="radio">
+                                <PrettyRadio v-model="frameworkSupport" :value="value" class="p-default p-round p-fill p-icon">
+                                    {{ value }}
+                                </PrettyRadio>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div v-if="fallbackHtmlEnabled || fallbackPhpEnabled" class="field is-horizontal is-aligned-top">
             <div class="field-label">
                 <label class="label">{{ $t('templates.domainSections.routing.fallbackRouting') }}</label>
@@ -145,7 +173,7 @@ THE SOFTWARE.
             enabled: true,
         },
         fallbackPhp: {
-            default: true,
+            default: false,
             enabled: true,
         },
         fallbackPhpPath: {
@@ -154,6 +182,15 @@ THE SOFTWARE.
         },
         legacyPhpRouting: {
             default: false,
+            enabled: true,
+        },
+        isFrameworkSupport: {
+            default: true,
+            enabled: true,
+        },
+        frameworkSupport: {
+            default: 'HIS',
+            options: ['ThinkPHP 6', 'HIS'],
             enabled: true,
         },
     };
@@ -182,6 +219,10 @@ THE SOFTWARE.
                         this.$props.data.fallbackHtml.computed = this.$props.data.fallbackHtml.value;
                         this.$props.data.fallbackPhp.enabled = true;
                         this.$props.data.fallbackPhp.computed = this.$props.data.fallbackPhp.value;
+                        this.$props.data.isFrameworkSupport.enabled = true;
+                        this.$props.data.isFrameworkSupport.computed = this.$props.data.isFrameworkSupport.value;
+                        this.$props.data.frameworkSupport.enabled = true;
+                        this.$props.data.frameworkSupport.computed = this.$props.data.frameworkSupport.value;
                     } else {
                         this.$props.data.index.enabled = false;
                         this.$props.data.index.computed = '';
@@ -189,6 +230,10 @@ THE SOFTWARE.
                         this.$props.data.fallbackHtml.computed = false;
                         this.$props.data.fallbackPhp.enabled = false;
                         this.$props.data.fallbackPhp.computed = false;
+                        this.$props.data.isFrameworkSupport.enabled = false;
+                        this.$props.data.isFrameworkSupport.computed = false;
+                        this.$props.data.frameworkSupport.enabled = false;
+                        this.$props.data.frameworkSupport.computed = false;
                     }
                 },
                 deep: true,
@@ -203,6 +248,19 @@ THE SOFTWARE.
                     } else {
                         this.$props.data.fallbackPhpPath.enabled = false;
                         this.$props.data.fallbackPhpPath.computed = '';
+                    }
+                },
+                deep: true,
+            },
+            // framework support
+            '$props.data.isFrameworkSupport': {
+                handler(data) {
+                    if (data.computed) {
+                        this.$props.data.frameworkSupport.enabled = true;
+                        this.$props.data.frameworkSupport.computed = this.$props.data.frameworkSupport.value;
+                    } else {
+                        this.$props.data.frameworkSupport.enabled = false;
+                        this.$props.data.frameworkSupport.computed = false;
                     }
                 },
                 deep: true,
