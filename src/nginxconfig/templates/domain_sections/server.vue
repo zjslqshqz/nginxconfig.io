@@ -161,7 +161,7 @@ THE SOFTWARE.
             enabled: true,
         },
         documentRoot: {
-            default: '/public',
+            default: '/',
             enabled: true,
         },
         wwwSubdomain: {
