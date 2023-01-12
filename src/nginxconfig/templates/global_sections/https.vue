@@ -267,17 +267,17 @@ THE SOFTWARE.
             enabled: true,
         },
         ocspCloudflare: {
-            default: true,
+            default: false,
             enabled: true,
         },
         ocspCloudflareType: clone(ipType),
         ocspGoogle: {
-            default: true,
+            default: false,
             enabled: true,
         },
         ocspGoogleType: clone(ipType),
         ocspOpenDns: {
-            default: true,
+            default: false,
             enabled: true,
         },
         ocspOpenDnsType: clone(ipType),
@@ -293,11 +293,11 @@ THE SOFTWARE.
         ocspVerisignType: clone(ipType),
         letsEncryptRoot: {
             default: '/var/www/_letsencrypt/',
-            enabled: true,
+            enabled: false,
         },
         letsEncryptCertRoot: {
             default: '/etc/letsencrypt/live/',
-            enabled: true,
+            enabled: false,
         },
     };
 
