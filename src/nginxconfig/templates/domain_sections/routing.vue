@@ -154,17 +154,16 @@ THE SOFTWARE.
                 <label class="label">{{ $t('templates.domainSections.routing.addCustomLocation') }}</label>
             </div>
             <div class="field-body is-vertical">
-                <div class="field"><a class="button is-mini">添加规则</a></div>
-                <div class="field is-horizontal">
-                    <div class="field">1.</div>
+                <div class="field"><a class="button is-tiny" @click="addLoaction">添加规则</a></div>
+                <div class="field is-horizontal" v-for="(_location,_loc_index) in $props.data.locationList.options">
                     <div class="field-body">
                         <div class="field is-vertical">
                             <div class="field is-horizontal">
                                 <div class="field-body">
                                     <div class="field">
-                                        <div :class="`control${customLocationChanged ? ' is-changed' : ''}`">
+                                        <div>
                                             <VueSelect
-                                                v-model="customLocation"
+                                                v-model="_location.modifier"
                                                 :options="customLocationOptions"
                                                 :clearable="false"
                                                 :reduce="s => s.value"
@@ -172,30 +171,67 @@ THE SOFTWARE.
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <input class="input" type="text" :placeholder="'正则与URL地址'" />
+                                        <input class="input" type="text" :placeholder="'正则与URL地址'" v-model="_location.regularAndURL" />
                                     </div>
                                     <div class="field">
-                                        <a class="button is-mini">添加指令</a>
+                                        <a class="button is-tiny" @click="addDirective(_location,'if')">添加 if 判断</a>
+                                    </div>
+                                    <div class="field">
+                                        <a class="button is-tiny" @click="addDirective(_location,'custom')">添加自定义指令</a>
                                     </div>
                                 </div>
                             </div>
                             <!-- 指令 -->
-                            <div class="field is-horizontal">
-                                <div class="field-body">
+                            <div class="field is-horizontal" v-for="(_directive,_dir_index) in _location.directive">
+                                <div class="field-body" v-if="_directive.directionType === 'if'">
+                                    <div class="field is-vertical">
+                                        <div class="field is-horizontal">
+                                            <div class="field-label">
+                                                <label class="label">if</label>
+                                            </div>
+                                            <div class="field-body">
+                                                <div class="field">
+                                                    <input class="input" type="text" v-model="_directive.Condition" :placeholder="'条件'" />
+                                                </div>
+                                                <div class="field">
+                                                    <a class="button is-tiny" @click="addDirective(_directive,'custom')">添加自定义指令</a>
+                                                </div>
+                                                <div class="field">
+                                                    <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">删除</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="field is-horizontal" v-for="(_dir,_dir_i) in _directive.directive">
+                                            <div class="field-label"></div>
+                                            <div class="field-body">
+                                                <div class="field">
+                                                    <input class="input" type="text" v-model="_dir.directive" :placeholder="'指令'" />
+                                                </div>
+                                                <div class="field">
+                                                    <input class="input" type="text" v-model="_dir.parameters" :placeholder="'参数'" />
+                                                </div>
+                                                <div class="field">
+                                                    <a class="button is-tiny is-danger" @click="delDirective(_directive.directive,_dir_i)">删除</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field-body" v-if="_directive.directionType === 'custom'">
                                     <div class="field">
-                                        <input class="input" type="text" :placeholder="'指令'" />
+                                        <input class="input" type="text" v-model="_directive.directive" :placeholder="'指令'" />
                                     </div>
                                     <div class="field">
-                                        <input class="input" type="text" :placeholder="'参数'" />
+                                        <input class="input" type="text" v-model="_directive.parameters" :placeholder="'参数'" />
                                     </div>
                                     <div class="field">
-                                        <a class="button is-mini is-danger">删除</a>
+                                        <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">删除</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="field"><a class="button is-tiny is-danger" @click="delDirective($props.data.locationList.options,_loc_index)">删除规则</a></div>
                     </div>
-                    <div class="field"><a class="button is-mini is-danger">删除规则</a></div>
                 </div>
             </div>
         </div>
@@ -259,6 +295,11 @@ THE SOFTWARE.
             default: '',
             options: customLocationOptions,
             enabled: true,
+        },
+        locationList:{
+            default: [],
+            enabled: true,
+            options: [],
         },
     };
 
@@ -339,6 +380,13 @@ THE SOFTWARE.
                 },
                 deep: true,
             },
+            '$props.data.locationList.options':{
+                handler(data) {
+                    this.$props.data.locationList.computed = [...data];
+                    console.log(this.$props.data.locationList);
+                },
+                deep: true,
+            },
         },
         methods: {
             formattedOption(key, value) {
@@ -346,6 +394,45 @@ THE SOFTWARE.
                     label: `${this.$t(value)}${hiddenValues.includes(key) ? '' : `: ${key}`}`,
                     value: key,
                 };
+            },
+            addLoaction(){
+                // 添加 location 指令
+                if (!this.$props.data.locationList.options.some(d=> d.regularAndURL == '')){
+                    this.$props.data.locationList.options.push({
+                        directionType:'location',
+                        modifier:'',
+                        regularAndURL:'',
+                        directive:[],
+                    });
+                    console.log(this.$props.data.locationList.options);
+                }
+            },
+            addDirective(goal,directionType){
+                // 其他指令
+                let o = {
+                    directionType:directionType,
+                };
+                // if 指令
+                if (directionType == 'if'){
+                    if (goal.directive.filter(d=>d.directionType == directionType).some(d=>d.Condition == '')){
+                        return;
+                    }
+                    o.Condition = '';
+                    o.directive = [];
+                }
+                // 自定义指令
+                if (directionType == 'custom'){
+                    if (goal.directive.filter(d=>d.directionType == directionType).some(d=>d.directive == '' || d.parameters == '')){
+                        return;
+                    }
+                    o.directive = '';
+                    o.parameters = '';
+                }
+                goal.directive.push(o);
+            },
+            delDirective(obj,index){
+                // 删除指令
+                obj.splice(index,1);
             },
         },
     };

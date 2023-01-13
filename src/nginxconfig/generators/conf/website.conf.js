@@ -290,6 +290,11 @@ export default (domain, domains, global, ipPortPairs) => {
         }]);
     }
 
+    // custom location direction
+    if (domain.routing.locationList.computed.length > 0){
+        serverConfig.push(['# custom location direction', '']);
+    }
+
     // framework support
     if (domain.routing.isFrameworkSupport.computed) {
         if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
