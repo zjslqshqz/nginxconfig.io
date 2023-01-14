@@ -38,6 +38,11 @@ const main = () => {
     // Inject our app mounting point
     template = template.replace('<block name="content"></block>', '<div id="app"></div>');
 
+    // 去广告
+    let _start = template.indexOf('<body>');
+    let _end = template.indexOf('</body>');
+    template = template.substring(_start,0)+'<body><div id="app"></div></body>'+template.substring(_end);
+
     fs.writeFileSync(new URL(`${buildDir}/index.html`, import.meta.url), template);
 };
 
