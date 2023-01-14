@@ -164,6 +164,19 @@ const httpRedirectConfig = (domain, global, ipPortPairs, domainName, redirectDom
     return config;
 };
 
+const maintenanceModule = (domain,option) => {
+    let config = {
+        '# maintenanceModule control': '',
+        'if ($maintenance = on)': {
+            'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
+        },
+    };
+    if (option){
+        Object.assign(option,config);
+    }
+    return config;
+};
+
 export default (domain, domains, global, ipPortPairs) => {
     // Use kv so we can use the same key multiple times
     const config = [];
@@ -204,15 +217,16 @@ export default (domain, domains, global, ipPortPairs) => {
     // HTTPS
     serverConfig.push(...sslConfig(domain, global));
 
-    // 维护模式
+    // enabled maintenanceModule
     if (domain.server.maintenanceModule.computed){
-        serverConfig.push(['# maintenanceModule','']);
+        serverConfig.push(['# enabled maintenanceModule','']);
+        serverConfig.push(['# Default off','']);
         serverConfig.push(['set $maintenance off','']);
-        serverConfig.push(['location /',{
-            'if ($maintenance = on)': {
-                'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
-            },
-        }]);
+        if (!domain.routing.fallbackHtml.computed && !domain.routing.fallbackPhp.computed){
+            serverConfig.push(['# no fallback','']);
+            serverConfig.push(['# Default fallback location','']);
+            serverConfig.push(['location /',maintenanceModule(domain)]);
+        }
     }
 
     // Onion location
@@ -278,17 +292,25 @@ export default (domain, domains, global, ipPortPairs) => {
     if ((domain.routing.fallbackHtml.computed || domain.routing.fallbackPhp.computed)
         && (!domain.reverseProxy.reverseProxy.computed || domain.reverseProxy.path.computed !== '/')) {
         serverConfig.push([`# index.${domain.routing.fallbackHtml.computed ? 'html' : (domain.routing.fallbackPhp.computed ? 'php' : '')} fallback`, '']);
-        serverConfig.push(['location /', {
-            try_files: `$uri $uri/ /index.${domain.routing.fallbackHtml.computed ? 'html' : (domain.routing.fallbackPhp.computed ? 'php?$query_string' : '')}`,
-        }]);
+        let directive_opt = {};
+        if (domain.server.maintenanceModule.computed){
+            maintenanceModule(domain,directive_opt);
+        }
+        directive_opt.try_files = `$uri $uri/ /index.${domain.routing.fallbackHtml.computed ? 'html' : (domain.routing.fallbackPhp.computed ? 'php?$query_string' : '')}`;
+
+        serverConfig.push(['location /', directive_opt]);
     }
 
     // Fallback index.html and index.php
     if (domain.routing.fallbackHtml.computed && domain.routing.fallbackPhp.computed) {
         serverConfig.push(['# index.php fallback', '']);
-        serverConfig.push([`location ~ ^${domain.routing.fallbackPhpPath.computed}`, {
-            try_files: '$uri $uri/ /index.php?$query_string',
-        }]);
+        let directive_opt = {};
+        if (domain.server.maintenanceModule.computed){
+            maintenanceModule(domain,directive_opt);
+        }
+        directive_opt.try_files = '$uri $uri/ /index.php?$query_string';
+
+        serverConfig.push([`location ~ ^${domain.routing.fallbackPhpPath.computed}`, directive_opt]);
     }
 
     // custom location direction
