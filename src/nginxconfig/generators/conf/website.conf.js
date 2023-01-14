@@ -171,6 +171,9 @@ const maintenanceModule = (domain,option) => {
             'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
         },
     };
+    if (domain.routing.frameworkSupport.computed && domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
+        Object.assign(option,thinkPHPConf(true));
+    }
     if (option){
         Object.assign(option,config);
     }
@@ -344,7 +347,7 @@ export default (domain, domains, global, ipPortPairs) => {
 
     // framework support
     if (domain.routing.isFrameworkSupport.computed) {
-        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
+        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6' && !domain.server.maintenanceModule.computed && !domain.routing.fallbackHtml.computed && !domain.routing.fallbackPhp.computed){
             if (global.tools.modularizedStructure.computed) {
                 // Modularized
                 serverConfig.push(['# thinkphp 6', '']);
