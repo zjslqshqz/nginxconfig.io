@@ -154,7 +154,7 @@ THE SOFTWARE.
                 <label class="label">{{ $t('templates.domainSections.routing.addCustomLocation') }}</label>
             </div>
             <div class="field-body is-vertical">
-                <div class="field"><a class="button is-tiny" @click="addLoaction">添加规则</a></div>
+                <div class="field"><a class="button is-tiny" @click="addLoaction">{{ $t('templates.domainSections.routing.addCustomBtn') }}</a></div>
                 <div class="field is-horizontal" v-for="(_location,_loc_index) in $props.data.locationList.options">
                     <div class="field-body">
                         <div class="field is-vertical">
@@ -171,13 +171,13 @@ THE SOFTWARE.
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <input class="input" type="text" :placeholder="'正则与URL地址'" v-model="_location.regularAndURL" />
+                                        <input class="input" type="text" :placeholder="$t('templates.domainSections.routing.regularAndURL')" v-model="_location.regularAndURL" />
                                     </div>
                                     <div class="field">
-                                        <a class="button is-tiny" @click="addDirective(_location,'if')">添加 if 判断</a>
+                                        <a class="button is-tiny" @click="addDirective(_location,'if')">{{$t('templates.domainSections.routing.addIfDirection')}}</a>
                                     </div>
                                     <div class="field">
-                                        <a class="button is-tiny" @click="addDirective(_location,'custom')">添加自定义指令</a>
+                                        <a class="button is-tiny" @click="addDirective(_location,'custom')">{{$t('templates.domainSections.routing.addCustomDirection')}}</a>
                                     </div>
                                 </div>
                             </div>
@@ -191,13 +191,13 @@ THE SOFTWARE.
                                             </div>
                                             <div class="field-body">
                                                 <div class="field">
-                                                    <input class="input" type="text" v-model="_directive.Condition" :placeholder="'条件'" />
+                                                    <input class="input" type="text" v-model="_directive.condition" :placeholder="$t('templates.domainSections.routing.addIfDirectionCondition')" />
                                                 </div>
                                                 <div class="field">
-                                                    <a class="button is-tiny" @click="addDirective(_directive,'custom')">添加自定义指令</a>
+                                                    <a class="button is-tiny" @click="addDirective(_directive,'custom')">{{$t('templates.domainSections.routing.addCustomDirection')}}</a>
                                                 </div>
                                                 <div class="field">
-                                                    <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">删除</a>
+                                                    <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">{{$t('templates.domainSections.routing.delDirection')}}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -205,13 +205,13 @@ THE SOFTWARE.
                                             <div class="field-label"></div>
                                             <div class="field-body">
                                                 <div class="field">
-                                                    <input class="input" type="text" v-model="_dir.directive" :placeholder="'指令'" />
+                                                    <input class="input" type="text" v-model="_dir.directive" :placeholder="$t('templates.domainSections.routing.customDirectionDirective')" />
                                                 </div>
                                                 <div class="field">
-                                                    <input class="input" type="text" v-model="_dir.parameters" :placeholder="'参数'" />
+                                                    <input class="input" type="text" v-model="_dir.parameters" :placeholder="$t('templates.domainSections.routing.customDirectionParameters')" />
                                                 </div>
                                                 <div class="field">
-                                                    <a class="button is-tiny is-danger" @click="delDirective(_directive.directive,_dir_i)">删除</a>
+                                                    <a class="button is-tiny is-danger" @click="delDirective(_directive.directive,_dir_i)">{{$t('templates.domainSections.routing.delDirection')}}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -219,18 +219,18 @@ THE SOFTWARE.
                                 </div>
                                 <div class="field-body" v-if="_directive.directionType === 'custom'">
                                     <div class="field">
-                                        <input class="input" type="text" v-model="_directive.directive" :placeholder="'指令'" />
+                                        <input class="input" type="text" v-model="_directive.directive" :placeholder="$t('templates.domainSections.routing.customDirectionDirective')" />
                                     </div>
                                     <div class="field">
-                                        <input class="input" type="text" v-model="_directive.parameters" :placeholder="'参数'" />
+                                        <input class="input" type="text" v-model="_directive.parameters" :placeholder="$t('templates.domainSections.routing.customDirectionParameters')" />
                                     </div>
                                     <div class="field">
-                                        <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">删除</a>
+                                        <a class="button is-tiny is-danger" @click="delDirective(_location.directive,_dir_index)">{{$t('templates.domainSections.routing.delDirection')}}</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="field"><a class="button is-tiny is-danger" @click="delDirective($props.data.locationList.options,_loc_index)">删除规则</a></div>
+                        <div class="field"><a class="button is-tiny is-danger" @click="delDirective($props.data.locationList.options,_loc_index)">{{$t('templates.domainSections.routing.delDirection')}}</a></div>
                     </div>
                 </div>
             </div>
@@ -246,11 +246,11 @@ THE SOFTWARE.
     import VueSelect from 'vue-select';
     const hiddenValues = [''];
     const customLocationOptions = {
-        '': '无修饰符',
-        '=': '精确查找',
-        '~': '区分大小写匹配',
-        '~*': '不区分大小写匹配',
-        '^~': '前缀匹配',
+        '': 'templates.domainSections.routing.customLocationOptionsNone',
+        '=': 'templates.domainSections.routing.customLocationOptionsAccurateSearch',
+        '~': 'templates.domainSections.routing.customLocationOptionsCaseSensitiveMatch',
+        '~*': 'templates.domainSections.routing.customLocationOptionsNoCaseSensitiveMatch',
+        '^~': 'templates.domainSections.routing.customLocationOptionsPrefixMatch',
     };
     const defaults = {
         root: {
@@ -383,7 +383,6 @@ THE SOFTWARE.
             '$props.data.locationList.options':{
                 handler(data) {
                     this.$props.data.locationList.computed = [...data];
-                    console.log(this.$props.data.locationList);
                 },
                 deep: true,
             },
@@ -404,7 +403,6 @@ THE SOFTWARE.
                         regularAndURL:'',
                         directive:[],
                     });
-                    console.log(this.$props.data.locationList.options);
                 }
             },
             addDirective(goal,directionType){
@@ -414,10 +412,10 @@ THE SOFTWARE.
                 };
                 // if 指令
                 if (directionType == 'if'){
-                    if (goal.directive.filter(d=>d.directionType == directionType).some(d=>d.Condition == '')){
+                    if (goal.directive.filter(d=>d.directionType == directionType).some(d=>d.condition == '')){
                         return;
                     }
-                    o.Condition = '';
+                    o.condition = '';
                     o.directive = [];
                 }
                 // 自定义指令

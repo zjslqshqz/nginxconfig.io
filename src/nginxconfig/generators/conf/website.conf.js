@@ -291,8 +291,32 @@ export default (domain, domains, global, ipPortPairs) => {
     }
 
     // custom location direction
-    if (domain.routing.locationList.computed.length > 0){
-        serverConfig.push(['# custom location direction', '']);
+    for (let l of domain.routing.locationList.computed){
+        if (l.directionType === 'location' && (l.modifier || l.regularAndURL)){
+            serverConfig.push(['# custom location direction', '']);
+            let a = ['location'];
+            if (l.modifier)
+                a.push(l.modifier);
+            if (l.regularAndURL)
+                a.push(l.regularAndURL);
+            let _dirText = a.join(' ');
+            let _dir = {};
+            for (let d of l.directive){
+                if (d.directionType === 'custom' && (d.directive !== '' && d.parameters !== '')){
+                    _dir[d.directive] = d.parameters;
+                }
+                if (d.directionType === 'if' && d.condition !== ''){
+                    let _d ={};
+                    for (let c of d.directive){
+                        if (c.directionType === 'custom' && (c.directive !== '' && c.parameters !== '')){
+                            _d[c.directive] = c.parameters;
+                        }
+                    }
+                    _dir[`if (${d.condition})`] = _d;
+                }
+            }
+            serverConfig.push([_dirText,_dir]);
+        }
     }
 
     // framework support
