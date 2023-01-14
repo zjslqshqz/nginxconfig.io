@@ -169,7 +169,7 @@ export default (domain, domains, global, ipPortPairs) => {
     const config = [];
 
     // 站点配置文件说明
-    config.push(['# ','note explain']);
+    config.push(['# ','Description']);
     config.push(['# ',domain.note.noteExplain.computed]);
 
     // Build the server config on its own before adding it to the parent config
@@ -208,11 +208,12 @@ export default (domain, domains, global, ipPortPairs) => {
     if (domain.server.maintenanceModule.computed){
         serverConfig.push(['# maintenanceModule','']);
         serverConfig.push(['set $maintenance off','']);
-        serverConfig.push(['if ($maintenance = on)',{
-            'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
+        serverConfig.push(['location /',{
+            'if ($maintenance = on)': {
+                'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
+            },
         }]);
     }
-
 
     // Onion location
     if (domain.onion.onionLocation.computed) {
