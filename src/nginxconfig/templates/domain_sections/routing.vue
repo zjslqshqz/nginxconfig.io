@@ -267,7 +267,7 @@ THE SOFTWARE.
             enabled: true,
         },
         fallbackPhp: {
-            default: false,
+            default: true,
             enabled: true,
         },
         fallbackPhpPath: {
