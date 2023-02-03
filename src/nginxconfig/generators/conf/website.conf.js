@@ -164,22 +164,6 @@ const httpRedirectConfig = (domain, global, ipPortPairs, domainName, redirectDom
     return config;
 };
 
-const maintenanceModule = (domain,option) => {
-    let config = {
-        '# maintenanceModule control': '',
-        'if ($maintenance = on)': {
-            'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
-        },
-    };
-    if (domain.routing.frameworkSupport.computed && domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
-        Object.assign(option,thinkPHPConf(true));
-    }
-    if (option){
-        Object.assign(option,config);
-    }
-    return config;
-};
-
 export default (domain, domains, global, ipPortPairs) => {
     // Use kv so we can use the same key multiple times
     const config = [];
@@ -225,11 +209,12 @@ export default (domain, domains, global, ipPortPairs) => {
         serverConfig.push(['# enabled maintenanceModule','']);
         serverConfig.push(['# Default off','']);
         serverConfig.push(['set $maintenance off','']);
-        if (!domain.routing.fallbackHtml.computed && !domain.routing.fallbackPhp.computed){
-            serverConfig.push(['# no fallback','']);
-            serverConfig.push(['# Default fallback location','']);
-            serverConfig.push(['location /',maintenanceModule(domain)]);
+        if (!domain.server.maintenanceModuleDirectiveCustom.computed){
+            serverConfig.push(['if ($maintenance = on)',{
+                'return': (domain.server.maintenanceHttpCodeSet.computed !== 'custom' ? domain.server.maintenanceHttpCodeSet.computed : domain.server.maintenanceHttpCodeSetCustom.computed),
+            }]);
         }
+
     }
 
     // Onion location
@@ -284,7 +269,7 @@ export default (domain, domains, global, ipPortPairs) => {
             serverConfig.push(['# index.php', '']);
             serverConfig.push(['index', 'index.php']);
         }
-        if (domain.routing.index.computed === '兼容模式') {
+        if (domain.routing.index.computed === 'all') {
             serverConfig.push(['# index.php', '']);
             serverConfig.push(['index', 'index.php index.html']);
         }
@@ -296,8 +281,9 @@ export default (domain, domains, global, ipPortPairs) => {
         && (!domain.reverseProxy.reverseProxy.computed || domain.reverseProxy.path.computed !== '/')) {
         serverConfig.push([`# index.${domain.routing.fallbackHtml.computed ? 'html' : (domain.routing.fallbackPhp.computed ? 'php' : '')} fallback`, '']);
         let directive_opt = {};
-        if (domain.server.maintenanceModule.computed){
-            maintenanceModule(domain,directive_opt);
+        // thinkphp only php fallback
+        if (!domain.routing.fallbackHtml.computed && domain.routing.fallbackPhp.computed && domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
+            Object.assign(directive_opt,thinkPHPConf(true));
         }
         directive_opt.try_files = `$uri $uri/ /index.${domain.routing.fallbackHtml.computed ? 'html' : (domain.routing.fallbackPhp.computed ? 'php?$query_string' : '')}`;
 
@@ -308,8 +294,9 @@ export default (domain, domains, global, ipPortPairs) => {
     if (domain.routing.fallbackHtml.computed && domain.routing.fallbackPhp.computed) {
         serverConfig.push(['# index.php fallback', '']);
         let directive_opt = {};
-        if (domain.server.maintenanceModule.computed){
-            maintenanceModule(domain,directive_opt);
+        // thinkphp only php fallback
+        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6'){
+            Object.assign(directive_opt,thinkPHPConf(true));
         }
         directive_opt.try_files = '$uri $uri/ /index.php?$query_string';
 
@@ -347,7 +334,8 @@ export default (domain, domains, global, ipPortPairs) => {
 
     // framework support
     if (domain.routing.isFrameworkSupport.computed) {
-        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6' && !domain.server.maintenanceModule.computed && !domain.routing.fallbackHtml.computed && !domain.routing.fallbackPhp.computed){
+        // only support not have fallback
+        if (domain.routing.frameworkSupport.computed === 'ThinkPHP 6' && !domain.routing.fallbackHtml.computed && !domain.routing.fallbackPhp.computed){
             if (global.tools.modularizedStructure.computed) {
                 // Modularized
                 serverConfig.push(['# thinkphp 6', '']);

@@ -258,8 +258,8 @@ THE SOFTWARE.
             enabled: true,
         },
         index: {
-            default: '兼容模式',
-            options: ['index.html', 'index.php','兼容模式'],
+            default: 'all',
+            options: ['index.html', 'index.php', 'all'],
             enabled: true,
         },
         fallbackHtml: {

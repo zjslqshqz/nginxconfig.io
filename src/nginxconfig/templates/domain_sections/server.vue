@@ -156,9 +156,18 @@ THE SOFTWARE.
                         </div>
                     </div>
                 </div>
+                <div v-if="maintenanceModuleDirectiveCustomEnabled" class="field">
+                    <div :class="`control${maintenanceModuleDirectiveCustomChanged ? ' is-changed' : ''}`">
+                        <div class="checkbox">
+                            <PrettyCheck v-model="maintenanceModuleDirectiveCustom" class="p-default p-curve p-fill p-icon">
+                                自定义维护模式
+                            </PrettyCheck>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div v-if="maintenanceModuleEnabled" class="field is-horizontal is-aligned-top">
+        <div v-if="maintenanceModuleEnabled && maintenanceHttpCodeSetEnabled" class="field is-horizontal is-aligned-top">
             <div class="field-label has-margin-top">
                 <label class="label">维护状态HTTP码设置</label>
             </div>
@@ -246,6 +255,10 @@ THE SOFTWARE.
             default: true,
             enabled: true,
         },
+        maintenanceModuleDirectiveCustom:{
+            default: false,
+            enabled: true,
+        },
         maintenanceHttpCodeSet:{
             default: '503',
             options: maintenanceHttpCodeSetOptions,
@@ -331,11 +344,11 @@ THE SOFTWARE.
                 handler(data) {
                     // This might cause recursion, but seems not to
                     if (data.computed) {
-                        this.$props.data.maintenanceModule.enabled = true;
-                        // this.$props.data.maintenanceSet.computed = this.$props.data.maintenanceSet.value;
+                        this.$props.data.maintenanceModuleDirectiveCustom.enabled = true;
+                        this.$props.data.maintenanceHttpCodeSet.enabled = true;
                     } else {
-                        this.$props.data.maintenanceModule.enabled = false;
-                        // this.$props.data.maintenanceSet.computed = false;
+                        this.$props.data.maintenanceModuleDirectiveCustom.enabled = false;
+                        this.$props.data.maintenanceHttpCodeSet.enabled = false;
                     }
                 },
                 deep: true,
